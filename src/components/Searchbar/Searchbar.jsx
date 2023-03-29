@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import { Header, SearchForm, SearchBtn, SearchInput } from './Searchbar.styled';
 
 let schema = yup.object().shape({
-  theme: yup.string().required(),
+  theme: yup.string().required('Search field is required'),
 });
 
 const initialValues = { theme: '' };
@@ -17,18 +17,20 @@ export const Searchbar = ({ onSubmit }) => {
         validationSchema={schema}
         onSubmit={onSubmit}
       >
-        <SearchForm>
-          <SearchBtn type="submit">
-            <span>&#128269;</span>
-          </SearchBtn>
-          <SearchInput
-            className="input"
-            type="text"
-            name="theme"
-            autoComplete="off"
-            placeholder="Search images and photos"
-          />
-        </SearchForm>
+        {({ isValid }) => (
+          <SearchForm>
+            <SearchBtn type="submit" disabled={!isValid}>
+              <span>&#128269;</span>
+            </SearchBtn>
+            <SearchInput
+              className="input"
+              type="text"
+              name="theme"
+              autoComplete="off"
+              placeholder="Search images and photos"
+            />
+          </SearchForm>
+        )}
       </Formik>
     </Header>
   );
