@@ -4,10 +4,10 @@ import * as yup from 'yup';
 import { Header, SearchForm, SearchBtn, SearchInput } from './Searchbar.styled';
 
 let schema = yup.object().shape({
-  search: yup.string().required(),
+  theme: yup.string().required(),
 });
 
-const initialValues = { search: '' };
+const initialValues = { theme: '' };
 
 export const Searchbar = ({ onSubmit }) => {
   return (
@@ -24,11 +24,10 @@ export const Searchbar = ({ onSubmit }) => {
           <SearchInput
             className="input"
             type="text"
-            name="search"
+            name="theme"
             autoComplete="off"
             placeholder="Search images and photos"
           />
-          {/* <ErrorMessage name="search" render={msg => <span> {msg} </span>} /> */}
         </SearchForm>
       </Formik>
     </Header>
