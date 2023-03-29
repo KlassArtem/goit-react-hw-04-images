@@ -1,83 +1,89 @@
 import { useState, useEffect } from 'react';
-import { Searchbar } from './Searchbar/Searchbar';
-import { ToastContainer, toast } from 'react-toastify';
-import { fetchImages } from '../helpers/api/index';
-import { ImageGallery } from './ImageGallery/ImageGallery';
+import { getApi, ItemsPerPage } from '../api'
+import { SearchBar } from './Searchbar/Searchbar';
+import { ImageGallery } from './ImageGallery/ImageGallery'
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
-import { AppWrap } from './App.styled';
-import { NotFound } from './NotFound/NotFound';
-import 'react-toastify/dist/ReactToastify.css';
+import Notiflix from 'notiflix';
+
 
 export const App = () => {
-  const [search, setSearch] = useState('');
-  const [images, setImages] = useState([]);
-  const [currentImage, setCurrentImage] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalHits, setTotalHits] = useState(0);
-  const [status, setStatus] = useState('idle');
-
+  const [pictures, setPictures] = useState([]);
+  const [searchQuerry, setSearchQuerry] = useState('');
+  const [page, setPage] = useState(1);
+  const [largeImage, setLargeImage] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [lastPage, setLastPage,] = useState(false);
+  
+ // для кнопки Load more----------------------------
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setStatus('pending');
-
-        if (currentPage !== 1) {
-          const { hits } = await fetchImages(search, currentPage);
-
-          setImages(prev => [...prev, ...hits]);
-          setStatus('resolved');
-
-          return;
-        }
-
-        const { hits, totalHits } = await fetchImages(search);
-
-        setImages(hits);
-        setTotalHits(totalHits);
-        setStatus('resolved');
-
-        if (hits.length === 0) {
-          toast.info(`on request ${search} Nothing found`);
-        }
-      } catch (error) {
-        setStatus('rejected');
-        toast.error('ooops something went wrong');
-      }
+    if (page > 1 && searchQuerry !== '') {
+      setLoading(true); getApi(searchQuerry, page).then((array) => {
+        if (array.length < ItemsPerPage) { setLastPage(true) } setPictures(prevstate => [...prevstate, ...array]); setLoading(false)
+      });
     };
-    fetchData();
-  }, [search, currentPage]);
+  }, [page, searchQuerry]);
 
-  const handleSearchValue = ({ theme }, { resetForm }) => {
-    setSearch(theme);
-    setCurrentPage(1);
-    resetForm();
+// Для кнопки Search  ------------------------------
+  useEffect(() => {
+    if (searchQuerry !== '') {
+      setPictures([])
+      setLoading(true); getApi(searchQuerry, 1)
+        .then((array) => {
+          if (array.length < ItemsPerPage && array.length > 0) { setLastPage(true) };
+          if (array.length === ItemsPerPage) { setLastPage(false) };
+          if (array.length) { setPictures(array) }
+          else { Notiflix.Notify.failure('Please enter valid search querry'); setPictures([]) } setLoading(false)
+        });
+    };
+  }, [searchQuerry]);
+  
+  const getLargeImage = (e) => {
+   setLargeImage(e.target.id)
+    if(e.target.nodeName==='IMG'){
+      setShowModal(true);
+    };
   };
 
-  const handleLoadMore = () => setCurrentPage(prev => prev + 1);
+ const searchQuerryToState = (value) => {
+   if (value === '') {
+      setPictures([])
+      Notiflix.Notify.warning('Please enter the search querry');
+      return;
+   };
+   setSearchQuerry(value);
+   setPage(1)
+  };
 
-  const handleCurrentImgClick = evt => setCurrentImage(evt);
+  const loadMore = () => {
+    setPage(page + 1);
+  };
+  
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gridGap: '16px',
+          paddingBottom: '24px'
+        }}
+      >
+        <SearchBar
+          onSearch={searchQuerryToState} />
+        {pictures.length > 0 && <ImageGallery
+          array={pictures}
+          getLargeImage={getLargeImage} />}
+        {loading && <Loader />}
+        {!loading && pictures.length > 0 && !lastPage && <Button loadMore={loadMore} />}
+        {showModal && <Modal
+          LargeImage={largeImage}
+          setShowModal={setShowModal}
+        />}
+      </div>
+    );
+  };
 
-  return (
-    <AppWrap>
-      <Searchbar onSubmit={handleSearchValue} />
-      <ImageGallery imgList={images} onClick={handleCurrentImgClick} />
 
-      {status === 'resolved' && images.length < totalHits && (
-        <Button onClick={handleLoadMore} />
-      )}
-
-      {currentImage && (
-        <Modal
-          image={currentImage}
-          handleModalClose={() => setCurrentImage(null)}
-        />
-      )}
-
-      {status === 'pending' && <Loader />}
-      {images.length === 0 && status === 'resolved' && <NotFound />}
-      <ToastContainer />
-    </AppWrap>
-  );
-};
+  

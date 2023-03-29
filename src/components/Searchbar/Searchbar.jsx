@@ -1,41 +1,45 @@
-import PropTypes from 'prop-types';
 import { Formik } from 'formik';
-import * as yup from 'yup';
-import { Header, SearchForm, SearchBtn, SearchInput } from './Searchbar.styled';
+import * as Yup from 'yup';
+import PropTypes from 'prop-types';
 
-let schema = yup.object().shape({
-  theme: yup.string().required('Search field is required'),
+import { Header, Form, Button, ButtonLabel, Field } from './Searchbar.styled';
+
+import { ReactComponent as SearchIcon } from "../../icons/search.svg";
+
+export function SearchBar ({onSearch}) {
+
+   const getValue = (initialValues) => {
+        const search = initialValues.searchQuerry.trim();
+            onSearch(search);
+    };
+
+const validationSchema = Yup.object({
+            searchQuerry: Yup.string(),
 });
+      return (
+          <Header>
+              <Formik
+                  initialValues={{ searchQuerry: '' }}
+                  onSubmit={(value) => getValue(value)}
+                  validationSchema={validationSchema}
+              >
+                  <Form>
+                      <Button type="submit">
+                          <SearchIcon width={20} height={20} />
+                          <ButtonLabel ></ButtonLabel>
+                      </Button>
+                      <Field
+                          name="searchQuerry"
+                          type="text"
+                          autoComplete="off"
+                          autoFocus
+                          placeholder="Search images and photos" />
+                  </Form>
+              </Formik>
+          </Header>
+      );
+    };
 
-const initialValues = { theme: '' };
-
-export const Searchbar = ({ onSubmit }) => {
-  return (
-    <Header>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={onSubmit}
-      >
-        {({ isValid, values }) => (
-  <SearchForm>
-    <SearchBtn type="submit" disabled={!isValid || !values.theme.trim()}>
-      <span>&#128269;</span>
-    </SearchBtn>
-    <SearchInput
-      className="input"
-      type="text"
-      name="theme"
-      autoComplete="off"
-      placeholder="Search images and photos"
-    />
-  </SearchForm>
-)}
-      </Formik>
-    </Header>
-  );
-};
-
-Searchbar.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
+    SearchBar.propTypes = {
+        onSearch: PropTypes.func.isRequired,
+    };

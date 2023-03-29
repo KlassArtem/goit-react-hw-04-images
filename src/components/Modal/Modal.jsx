@@ -1,43 +1,28 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { Overlay, ModalContainer } from './Modal.styled';
 import { createPortal } from 'react-dom';
-import { Overlay, ModalWindow } from './Modal.styled';
 
-const modalRoot = document.querySelector('#modal-root');
+const ModalRoot = document.querySelector('#modal-root');
 
-export const Modal = ({ handleModalClose, image }) => {
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
+export function Modal ({LargeImage, setShowModal}) {
+   
+   const modalEventLisetener = (e) => {
+        if (e.target.id === 'overlay') { return setShowModal(false) };
+    };
 
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  });
+    return createPortal(
+        <Overlay onClick={modalEventLisetener} id='overlay'>
+            <ModalContainer>
+                <img src={LargeImage} alt="" />
+            </ModalContainer>
+        </Overlay>,
+            ModalRoot
+        );
+    };
+ Modal.propTypes = {
+        LargeImage: PropTypes.string.isRequired,
+        setShowModal: PropTypes.func.isRequired,
+    };
+    
 
-  const handleBackdropClick = ({ target, currentTarget }) => {
-    if (target !== currentTarget) {
-      return;
-    }
-    handleModalClose();
-  };
 
-  const handleKeyDown = ({ code }) => {
-    if (code !== 'Escape') {
-      return;
-    }
-
-    handleModalClose();
-  };
-
-  return createPortal(
-    <Overlay onClick={handleBackdropClick}>
-      <ModalWindow>
-        <img src={image} alt="" />
-      </ModalWindow>
-    </Overlay>,
-    modalRoot
-  );
-};
-
-Modal.propTypes = {
-  handleModalClose: PropTypes.func.isRequired,
-  image: PropTypes.string.isRequired,
-};

@@ -1,18 +1,19 @@
-import { Oval } from 'react-loader-spinner';
+import { BallTriangle } from 'react-loader-spinner'
+import { Container } from './Loader.styled'
 
-export const Loader = () => {
-  return (
-    <Oval
-      height={180}
-      width={180}
-      color="#4fa94d"
-      wrapperStyle={{ justifyContent: 'center', margin: '70px 0' }}
-      wrapperClass=""
-      visible={true}
-      ariaLabel="oval-loading"
-      secondaryColor="#4fa94d"
-      strokeWidth={2}
-      strokeWidthSecondary={2}
-    />
-  );
+export function Loader() {
+    return (
+        <Container>
+            <BallTriangle
+                height={100}
+                width={100}
+                radius={5}
+                color="#4fa94d"
+                ariaLabel="ball-triangle-loading"
+                wrapperClass={{}}
+                wrapperStyle=""
+                visible={true}
+            />
+        </Container>
+    );
 };

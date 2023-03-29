@@ -1,35 +1,26 @@
-import PropTypes from 'prop-types';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
-import { GalleryList, GalleryItem } from './ImageGallery.styled';
+import PropTypes from 'prop-types';
+import { List } from './ImageGallery.styled';
 
-export const ImageGallery = ({ imgList, onClick }) => {
-  
-  if (imgList.length === 0) {
-    return null;
-  }
-
-  return (
-    <GalleryList>
-      {imgList.map(({ id, webformatURL, largeImageURL }) => (
-        <GalleryItem key={id}>
-          <ImageGalleryItem
-            webformatURL={webformatURL}
-            largeImageURL={largeImageURL}
-            onClick={onClick}
-          />
-        </GalleryItem>
-      ))}
-    </GalleryList>
-  );
+export function ImageGallery({ array, getLargeImage }) {
+    return (
+        <List onClick={getLargeImage}>
+            {array.map(({ id, webformatURL, largeImageURL }) => {
+                return <ImageGalleryItem getLargeImage={getLargeImage} key={id}
+                    imageUrl={webformatURL}
+                    largeImageURL={largeImageURL} />
+            })}
+        </List>
+    );
 };
 
-ImageGallery.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  imgList: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      webformatURL: PropTypes.string.isRequired,
-      largeImageURL: PropTypes.string.isRequired,
-    })
-  ).isRequired, 
+ImageGallery.propTytpes = {
+    getLargeImage: PropTypes.func.isRequired,
+    array: PropTypes.arrayOf(
+        PropTypes.exact({
+            id: PropTypes.number.isRequired,
+            webformatURL: PropTypes.string.isRequired,
+            largeImageURL: PropTypes.string.isRequired
+        }).isRequired,
+    ).isRequired,
 };
