@@ -17,20 +17,20 @@ export const Searchbar = ({ onSubmit }) => {
         validationSchema={schema}
         onSubmit={onSubmit}
       >
-        {({ isValid }) => (
-          <SearchForm>
-            <SearchBtn type="submit" disabled={!isValid}>
-              <span>&#128269;</span>
-            </SearchBtn>
-            <SearchInput
-              className="input"
-              type="text"
-              name="theme"
-              autoComplete="off"
-              placeholder="Search images and photos"
-            />
-          </SearchForm>
-        )}
+        {({ isValid, values }) => (
+  <SearchForm>
+    <SearchBtn type="submit" disabled={!isValid || !values.theme.trim()}>
+      <span>&#128269;</span>
+    </SearchBtn>
+    <SearchInput
+      className="input"
+      type="text"
+      name="theme"
+      autoComplete="off"
+      placeholder="Search images and photos"
+    />
+  </SearchForm>
+)}
       </Formik>
     </Header>
   );
